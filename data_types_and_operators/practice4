@@ -1,0 +1,48 @@
+public class IntegerCacheDemo {
+    public static void main(String[] args) {
+        int i1 = 128;
+        Integer a1 = i1;
+        Integer b1 = i1;
+        System.out.println("a1==i1 " + (a1 == i1)); // true (unboxing of a1)
+        System.out.println("b1==i1 " + (b1 == i1)); // true (unboxing of b1)
+        System.out.println("a1==b1 " + (a1 == b1)); // false (different Integer objects for numbers > 127)
+        System.out.println("a1.equals(i1) -> " + a1.equals(i1)); // true (equals() compares values)
+        System.out.println("b1.equals(i1) -> " + b1.equals(i1)); // true (equals() compares values)
+        System.out.println("a1.equals(b1) -> " + a1.equals(b1)); // true (equals() compares values)
+
+        int i2 = 127;
+        Integer a2 = i2;
+        Integer b2 = i2;
+        System.out.println("a2==i2 " + (a2 == i2)); // true (unboxing of a2)
+        System.out.println("b2==i2 " + (b2 == i2)); // true (unboxing of b2)
+        System.out.println("a2==b2 " + (a2 == b2)); // true (IntegerCache used for -128 to 127)
+        System.out.println("a2.equals(i2) -> " + a2.equals(i2)); // true (equals() compares values)
+        System.out.println("b2.equals(i2) -> " + b2.equals(i2)); // true (equals() compares values)
+        System.out.println("a2.equals(b2) -> " + a2.equals(b2)); // true (equals() compares values)
+    }
+}
+Объяснение полученного результата:
+
+Для i1 = 128:
+
+a1 == i1: Истинно, поскольку a1 распаковывается (unboxing) в int, а значения равны.
+b1 == i1: Истинно, по той же причине.
+a1 == b1: Ложно, потому что значения больше 127 не кэшируются, и a1 и b1 указывают на разные объекты Integer.
+a1.equals(i1): Истинно, метод equals() сравнивает значения, а не ссылки.
+b1.equals(i1): Истинно, по аналогии с предыдущим.
+a1.equals(b1): Истинно, поскольку метод equals() сравнивает значения Integer.
+Для i2 = 127:
+
+a2 == i2: Истинно, поскольку a2 распаковывается в int, а значения равны.
+b2 == i2: Истинно, по той же причине.
+a2 == b2: Истинно, поскольку для значений от -128 до 127 используется кэш IntegerCache, и обе ссылки указывают на один и тот же объект.
+a2.equals(i2): Истинно, метод equals() сравнивает значения.
+b2.equals(i2): Истинно, по аналогии с предыдущим.
+a2.equals(b2): Истинно, поскольку equals() сравнивает значения Integer.
+Роль класса IntegerCache:
+
+IntegerCache — это внутренний класс java.lang.Integer, который используется для хранения кэшированных объектов Integer в диапазоне от -128 до 127. Это делается для оптимизации использования памяти и повышения производительности, поскольку эти значения часто используются в программах.
+
+Когда создается Integer для числа в этом диапазоне (например, с помощью автоупаковки), JVM возвращает ссылку на существующий объект из кэша, а не создает новый объект. Это позволяет избежать лишних аллокаций памяти и экономит ресурсы.
+
+Для значений за пределами диапазона -128 до 127 создаются новые объекты Integer, поэтому ссылки на такие объекты не будут равны (==), хотя их значения могут быть равными (equals()).
